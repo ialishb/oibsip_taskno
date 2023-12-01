@@ -1,0 +1,46 @@
+import speech_recognition as sr
+import pyttsx3
+from datetime import datetime
+import webbrowser
+
+def speak(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+
+def listen():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source, duration=1)
+        try:
+            audio = recognizer.listen(source, timeout=10)  # Increase the timeout
+            query = recognizer.recognize_google(audio).lower()
+            print(f"User: {query}")
+            return query
+        except sr.UnknownValueError:
+            print("Sorry, I didn't catch that. Can you please repeat?")
+            return ""
+        except sr.RequestError as e:
+            print(f"Could not request results from Google Speech Recognition service; {e}")
+            return ""
+
+def main():
+    speak("Hello! How can I assist you today?")
+
+    while True:
+        user_input = listen()
+
+        if "search" in user_input:
+            speak("What would you like to search for?")
+            search_query = listen()
+            print(f"Search Query: {search_query}")  # Add this line to print the search query
+            if search_query:
+                search_url = f"https://www.google.com/search?q={search_query}"
+                webbrowser.open(search_url)
+            else:
+                speak("I didn't catch that. Can you please repeat the search query?")
+
+
+if __name__ == "__main__":
+    main()
